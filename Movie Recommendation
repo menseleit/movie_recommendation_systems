@@ -6,6 +6,11 @@ Created on Thu Jun 23 20:49:51 2022
 @author: maddieenseleit
 """
 
+Following Kaggle Tutorial:
+    
+https://www.kaggle.com/code/ibtesama/getting-started-with-a-movie-recommendation-system/notebook
+    
+    
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
