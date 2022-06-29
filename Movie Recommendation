@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jun 23 20:49:51 2022
+
+@author: maddieenseleit
+"""
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df1 = pd.read_csv ('Documents/Movie_Input/tmdb_5000_credits.csv')
+df2 = pd.read_csv ('Documents/Movie_Input/tmdb_5000_movies.csv')
+
+# Merging two columns 
+
+df1.columns = ['id', 'title', 'cast', 'crew']
+df2 = df2.merge(df1, on='id')
+
+#print(df2.head(5))
+
+#Creating metric to rate movie
+#formula = v/v+m*r + m/v+m*c
+#We need c and m value
+c = df2['vote_average'].mean()
+print(c)
+
+m = df2['vote_count'].quantile(0.9)
+print(m)
+
+#Filter movies
+
+q_movies = df2.copy().loc[df2['vote_count'] >=m]
+print(q_movies.shape)
+# 481 movies and 23 columns
+
+#Create new function to calculate metric for each movie
+
+def weighted_rating(x, m=m, c=c):
+    v = x['vote_count']
+    r = x['vote_average']
+    return ( v/(v+m) * r ) + (m/(m+v)*c )
+
+#Create score feature
+
+q_movies['score'] = q_movies.apply(weighted_rating, axis=1)
+
+#Sort based on score. From highest to lowest. 
+
+q_movies = q_movies.sort_values('score', ascending= False)
+
+print(q_movies[['title_x', 'vote_count', 'vote_average', 'score']].head(20))
+#Shawshank redemption has highest score but one of the lower vote_counts. 
+#The godfather and the dark knight both have the highest vote_count.
+#Vote average highest for movie 6 and 14.
+
+
+popularity = df2.sort_values('popularity', ascending=False)
+plt.figure(figsize= (12,6))
+
+plt.bar(popularity['title_x'].head(6),popularity['popularity'].head(6),
+        color='skyblue')
+plt.xlabel("Popularity")
+plt.title("Popular Movies")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
